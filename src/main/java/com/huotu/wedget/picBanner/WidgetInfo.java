@@ -69,9 +69,9 @@ public class WidgetInfo implements Widget{
         return 0;
     }
 
-
-    String widgetJsHref(){
-        return "";
+    @Override
+    public Resource widgetJs() {
+        return new ClassPathResource("/js/picBanner.js", getClass().getClassLoader());
     }
 
     @Override
