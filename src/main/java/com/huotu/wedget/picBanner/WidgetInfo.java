@@ -16,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -67,6 +68,11 @@ public class WidgetInfo implements Widget{
     @Override
     public int dependBuild() {
         return 0;
+    }
+
+    @Override
+    public Map<String, Resource> publicResources() {
+        return null;
     }
 
     @Override
