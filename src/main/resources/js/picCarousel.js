@@ -1,21 +1,9 @@
-//define(function (require, exports, module) {
-    //var index = 0;
-    //var widgetId;
 
-
-    //exports.init = function () {
-    //    banner.init();
-    //};
-    //exports.setWidgetId = function (id) {
-    //    banner.setWidgetId(id);
-    //}
-//});
-
-var banner = {
+var picBanner = {
     index: 0,
     widgetId:null,
     styleItemClick: function () {
-        $(".bannerItem").on("click", function () {
+        $(".picCarouselItem").on("click", function () {
             //todo 获取样式id的预览视图
             var styleId = $(this).attr("data-styleId");
         });
@@ -39,23 +27,23 @@ var banner = {
                         var code = parseInt(json.code);
                         switch (code) {
                             case 200:
-                                if ($(this).attr("id") == 'file1') {
+                                if ($(this).attr("id") == 'picCarouselFile1') {
                                     info.maxUrls[index] = json.data.fileUri;
                                 } else {
                                     info.minUrls[index] = json.data.fileUri;
                                 }
                                 $('#' + widgetId).data(info);
                                 index++;
-                                $(this).parent().parent().children("ul").append(-+-
-                                        '<li class="item">' +
-                                    '<div style="position:relative;">' +
-                                    '<img src="' + json.data.fileUri + '" />' +
-                                    '<div>' +
-                                    '<p style="height:20px; width:100%;background-color: rgba(100,100,100,0.5); text-align:center; color:#FFFFFF;position:absolute; bottom:0px;"' +
-                                    ' class="deleteImg" >删除</p>' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '</li>');
+                                $(this).parent().parent().children("ul").append(
+                                    '<li class="item">'
+                                    +'<div style="position:relative;">'
+                                    +'<img src="' + json.data.fileUri + '" />'
+                                    +'<div>'
+                                    +'<p style="height:20px; width:100%;background-color: rgba(100,100,100,0.5);text-align:center; color:#FFFFFF;position:absolute; bottom:0px;"'
+                                    +' class="deleteImg" >删除</p>'
+                                    +'</div>'
+                                    +'</div>'
+                                    +'</li>');
                                 layer.msg("操作成功", {time: 2000});
                                 break;
                             case 403:
@@ -102,8 +90,8 @@ var banner = {
                         }
                     }
                 },
-                error: function (data) {
-                    $.jBox.tip("error");
+                error: function () {
+                    layer.msg("操作错误", {time: 2000});
                 }
             });
         });
@@ -112,8 +100,21 @@ var banner = {
         widgetId = widgetId;
     },
     init: function () {
-        banner.styleItemClick();
-        banner.uploadImage();
-        banner.delUploadImage();
+        picBanner.styleItemClick();
+        picBanner.uploadImage();
+        picBanner.delUploadImage();
     }
 };
+
+//define(function (require, exports, module) {
+//var index = 0;
+//var widgetId;
+
+
+//exports.init = function () {
+//    banner.init();
+//};
+//exports.setWidgetId = function (id) {
+//    banner.setWidgetId(id);
+//}
+//});
