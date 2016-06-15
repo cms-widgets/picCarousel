@@ -70,10 +70,11 @@ public class WidgetInfo implements Widget{
         return 0;
     }
 
-
-    String widgetJsHref(){
-        return "";
+    @Override
+    public String widgetJsHref() {
+        return null;
     }
+
 
     @Override
     public WidgetStyle[] styles() {
