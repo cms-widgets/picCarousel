@@ -22,7 +22,6 @@ import java.util.Properties;
  * @author CJ
  */
 public class WidgetInfo implements Widget{
-    Properties properties = new Properties();
 
     /*
      * 图片轮播控件必须要有一个图片数组数据["1.png","2.png"]
@@ -154,12 +153,6 @@ public class WidgetInfo implements Widget{
 
     @Override
     public Class springConfigClass() {
-        try {
-            properties.load(new ClassPathResource("/META-INF/widget.properties").getInputStream());
-            return Class.forName(properties.get("widgetClasses").toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return null;
     }
 
