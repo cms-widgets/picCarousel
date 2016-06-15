@@ -7,15 +7,16 @@
  * 2013-2016. All rights reserved.
  */
 
-package com.huotu.wedget.picBanner;
+package com.huotu.hotcms.widget.picCarousel;
 
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map;
 import java.util.Properties;
 
@@ -23,25 +24,24 @@ import java.util.Properties;
  * @author CJ
  */
 public class WidgetInfo implements Widget{
-
     /*
      * 图片轮播控件必须要有一个图片数组数据["1.png","2.png"]
      */
-    public static final String validPicArray = "picArray";
-
+    public static final String VALID_MAX_PICS = "maxPicArray";
+    public static final String VALID_MIN_PICS = "maxPicArray";
     /*
      * 指定风格的模板类型 如：html,text等
      */
-    public static final String validStyleTemplate = "styleTemplate";
+    public static final String VALID_STYLE_TEMPLATE = "styleTemplate";
 
     @Override
     public String groupId() {
-        return "com.huotu.wedget.picBanner";
+        return "com.huotu.hotcms.widget.picCarousel";
     }
 
     @Override
     public String widgetId() {
-        return "picBanner";
+        return "picCarousel";
     }
 
     @Override
@@ -72,66 +72,25 @@ public class WidgetInfo implements Widget{
 
     @Override
     public Map<String, Resource> publicResources() {
-        return null;
+        Map<String, Resource> map = new HashMap<>();
+        map.put("img/banner01.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/banner02.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/banner03.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/banner04.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
+        map.put("img/sd03.png",new ClassPathResource("img/sd03.png",getClass().getClassLoader()));
+        return map;
     }
 
     @Override
     public Resource widgetJs() {
-        return new ClassPathResource("/js/picBanner.js", getClass().getClassLoader());
+        return new ClassPathResource("/js/picCarousel.js", getClass().getClassLoader());
     }
 
     @Override
     public WidgetStyle[] styles() {
-
-        WidgetStyle widgetStyle = new WidgetStyle() {
-
-            @Override
-            public String id() {
-                return widgetId()+"1";
-            }
-
-            @Override
-            public String name() {
-                return "bootstrap 风格";
-            }
-
-            @Override
-            public String name(Locale locale) {
-                if (locale.equals(Locale.CHINESE)) {
-                    return "bootstrap 风格";
-                }
-                return "bootstrap style";
-            }
-
-            @Override
-            public String description() {
-                return "基于bootstrap样式的图片轮播";
-            }
-
-            @Override
-            public String description(Locale locale) {
-                if (locale.equals(Locale.CHINESE)) {
-                    return "基于bootstrap样式的图片轮播";
-                }
-                return "Based on the bootstrap style by picture";
-            }
-
-            @Override
-            public Resource thumbnail() {
-                return new ClassPathResource(MessageFormat.format("/thumbnail/{0}Style.png", id()), getClass().getClassLoader());
-            }
-
-            @Override
-            public Resource previewTemplate() {
-                return new ClassPathResource(MessageFormat.format("/template/{0}PreviewTemplate.html", id()), getClass().getClassLoader());
-            }
-
-            @Override
-            public Resource browseTemplate() {
-                return new ClassPathResource(MessageFormat.format("/template/{0}BrowseTemplate.html", id()), getClass().getClassLoader());
-            }
-        };
-        return new WidgetStyle[]{widgetStyle};
+        return new WidgetStyle[]{new DefaultStyle()};
     }
 
     @Override
@@ -149,13 +108,14 @@ public class WidgetInfo implements Widget{
         if (!flag) {
             throw new IllegalArgumentException();
         }
-        String[] picArr = (String[]) componentProperties.get(validPicArray);
-        String template = (String) componentProperties.get(validStyleTemplate);
-        if (picArr == null || template == null || picArr.length > 0 ||  !"html".equals(template)) {
+        String[] maxPicArr = (String[]) componentProperties.get(VALID_MAX_PICS);
+        String[] minPicArr = (String[]) componentProperties.get(VALID_MIN_PICS);
+        String template = (String) componentProperties.get(VALID_STYLE_TEMPLATE);
+        if (maxPicArr == null || maxPicArr.length!=4 || minPicArr==null || minPicArr.length !=4
+                || template == null || !"html".equals(template)) {
             throw new IllegalArgumentException();
         }
     }
-
 
     @Override
     public Class springConfigClass() {
