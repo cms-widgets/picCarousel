@@ -1,5 +1,6 @@
 package com.huotu.wedget.picBanner;
 
+import com.huotu.hotcms.widget.Widget;
 import com.huotu.widget.test.WidgetTest;
 import org.openqa.selenium.WebElement;
 
@@ -20,7 +21,7 @@ public class MyWidgetTest extends WidgetTest {
     }
 
     @Override
-    protected void editorWork(WebElement editor, Supplier<Map<String,Object>> currentWidgetProperties){
+    protected void editorWork(Widget widget,WebElement editor, Supplier<Map<String,Object>> currentWidgetProperties){
         editor.click();
 
         String alert = driver.switchTo().alert().getText();
