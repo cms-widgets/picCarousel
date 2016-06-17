@@ -1,19 +1,94 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<script>
-    $(function () {
-        $(".editor").click(function () {
-            alert('click me');
-            var properties = widgetProperties(this);
-            properties[count] =1;
-        })
-    });
-    alert("opened");
-</script>
+
 <div class="editor" style="display:block;">
+    <script>
+        $(function () {
+            var properties = widgetProperties($(".editor"));
+            properties['maxImgUrl'] = [];
+            properties['minImgUrl'] = [];
+            $(".imgfile").click(function(){
+                //todo 请求服务器
+                var json={
+                    code:200,
+                    data:{fileUri:"img/file.jpe"}
+                }
+
+                if (json != null) {
+                    var code = parseInt(json.code);
+                    switch (code) {
+                        case 200:
+                            var className= "maxDeleteImg";
+                            if ($(this).attr("id") == 'picCarouselFile1') {
+                                properties['maxImgUrl'].push({fileUri:json.data.fileUri});
+                            } else {
+                                properties['minImgUrl'].push({fileUri:json.data.fileUri});
+                                className="minDeleteImg";
+                            }
+                            $(this).parent().parent().children("ul").append(
+                                    '<li class="item">'
+                                    +'<div style="position:relative;">'
+                                    +'<img src="' + json.data.fileUri + '" />'
+                                    +'<div>'
+                                    +'<p style="height:20px; width:100%;background-color: rgba(100,100,100,0.5);text-align:center; color:#FFFFFF;position:absolute; bottom:0px;"'
+                                    +' class="'+className+'" >删除</p>'
+                                    +'</div>'
+                                    +'</div>'
+                                    +'</li>');
+                            break;
+                        case 403:
+                            alert("403");
+                            break;
+                        case 502:
+                            alert("403");
+                            break;
+                    }
+                }
+            });
+
+
+            $(".imagesDiv").on("click",".maxDeleteImg",function() {
+                var fileUri = $(this).parent().parent().children("img").attr("src");
+                delImg(fileUri,'maxImgUrl');
+            });
+
+            $(".imagesDiv").on("click",".minDeleteImg",function () {
+                var fileUri = $(this).parent().parent().children("img").attr("src");
+                delImg(fileUri,'minImgUrl');
+            });
+
+            function delImg(uri,type){
+                var json={
+                    code:200
+                };
+                if (json != null) {
+                    var code = parseInt(json.code);
+                    switch (code) {
+                        case 200:
+                            $.grep(properties[type], function(cur,index){
+                                 if(cur["fileUri"]==uri){
+                                     alert(cur["fileUri"])
+                                     properties[type].splice(index,1);
+                                 }
+                            });
+                            $(this).parent().parent().parent().remove();
+                            break;
+                        case 403:
+                            alert("403");
+                            break;
+                        case 500:
+                            alert("403");
+                            break;
+                    }
+                }
+            }
+
+        });
+
+    </script>
     <div class="conf-header">
         <p>设置</p>
-        <button class="btn btn-danger" id="cancelBtn">取消</button>
-        <button class="btn btn-success" id="confBtn">保存</button>
+        <button class="btn btn-danger" >取消</button>
+        <button class="btn btn-success" >保存</button>
     </div>
     <div class="conf-body" style="display:block;">
         <!--编辑视图-->
@@ -29,7 +104,7 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div class="imagesDiv">
             <h3>
                 <i class="icon-puzzle"></i><b></b>选择图片1920x700
             </h3>
