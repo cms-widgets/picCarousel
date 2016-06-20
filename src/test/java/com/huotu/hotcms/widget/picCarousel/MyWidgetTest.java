@@ -20,7 +20,7 @@ public class MyWidgetTest extends WidgetTest {
 
     @Override
     protected boolean printPageSource() {
-        return false;
+        return true;
     }
 
     @Override
@@ -70,6 +70,17 @@ public class MyWidgetTest extends WidgetTest {
 
     @Override
     protected void browseWork(Widget widget, WidgetStyle style, Function<ComponentProperties, WebElement> uiChanger) {
+        ComponentProperties properties = new ComponentProperties();
+        properties.put("imgs",new String[]{"img/01.jpg","img/01.jpg","img/01.jpg"
+                ,"img/01.jpg","img/01.jpg","img/01.jpg" });
+        WebElement browse = uiChanger.apply(properties);
+        String [] imgs = (String[]) properties.get("imgs");
+        List<WebElement> items = browse.findElements(By.className("item"));
+        for (WebElement item : items){
+            WebElement imgTag = item.findElement(By.tagName("img"));
+        }
+
+
     }
 
 }
