@@ -79,8 +79,7 @@ public class MyWidgetTest extends WidgetTest {
         for (WebElement item : items){
             WebElement imgTag = item.findElement(By.tagName("img"));
         }
-
-
     }
+
 
 }
