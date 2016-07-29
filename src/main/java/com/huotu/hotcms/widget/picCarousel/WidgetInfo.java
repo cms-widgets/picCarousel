@@ -12,9 +12,17 @@ package com.huotu.hotcms.widget.picCarousel;
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
+import me.jiangcai.lib.resource.service.ResourceService;
+import org.apache.http.entity.ContentType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,12 +33,14 @@ public class WidgetInfo implements Widget{
     /*
      * 图片轮播控件必须要有一个图片数组数据["1.png","2.png"]
      */
-    public static final String VALID_MAX_PICS = "maxPicArray";
-    public static final String VALID_MIN_PICS = "maxPicArray";
+    public static final String VALID_MAX_PICS = "maxImgUrl";
+    public static final String VALID_MIN_PICS = "minImgUrl";
+
     /*
      * 指定风格的模板类型 如：html,text等
      */
     public static final String VALID_STYLE_TEMPLATE = "styleTemplate";
+
 
     @Override
     public String groupId() {
@@ -78,7 +88,15 @@ public class WidgetInfo implements Widget{
         map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
         map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
         map.put("img/sd03.png",new ClassPathResource("img/sd03.png",getClass().getClassLoader()));
+        map.put("js/picCarousel.js",new ClassPathResource("js/picCarousel.js",getClass().getClassLoader()));
+        map.put("thumbnail/picCarousel1Style.png",new ClassPathResource("thumbnail/picCarousel1Style.png"
+                ,getClass().getClassLoader()));
         return map;
+    }
+
+    @Override
+    public Resource widgetDependencyContent(ContentType contentType) {
+        return null;
     }
 
     @Override
@@ -108,9 +126,7 @@ public class WidgetInfo implements Widget{
         }
         String[] maxPicArr = (String[]) componentProperties.get(VALID_MAX_PICS);
         String[] minPicArr = (String[]) componentProperties.get(VALID_MIN_PICS);
-        String template = (String) componentProperties.get(VALID_STYLE_TEMPLATE);
-        if (maxPicArr == null || maxPicArr.length!=4 || minPicArr==null || minPicArr.length !=4
-                || template == null || !"html".equals(template)) {
+        if (maxPicArr == null || maxPicArr.length!=4 || minPicArr==null || minPicArr.length!=4) {
             throw new IllegalArgumentException();
         }
     }
@@ -120,5 +136,24 @@ public class WidgetInfo implements Widget{
         return null;
     }
 
+    @Override
+    public ComponentProperties defaultProperties(ResourceService resourceService) {
+        List<String> maxImages = new ArrayList<>();
+        ComponentProperties properties = new ComponentProperties();
+        try {
+            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
+                    + "/"+"img/banner01.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
+                    + "/"+"img/banner02.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
+                    + "/"+"img/banner03.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
+                    + "/"+"img/banner04.jpg").httpUrl().toURI().toString());
+            properties.put("maxImgUrl",maxImages);
+        } catch (URISyntaxException |IOException e) {
+            e.printStackTrace();
+        }
+        return properties;
+    }
 
 }
