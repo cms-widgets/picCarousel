@@ -56,20 +56,15 @@ public class WidgetInfo implements Widget {
 
     @Override
     public String name(Locale locale) {
-        if (locale.equals(Locale.CHINESE)) {
+        if (locale.equals(Locale.CHINA)) {
             return "图片轮播";
         }
         return "Picture carousel";
     }
 
     @Override
-    public String description() {
-        return "这是一个图片轮播，你可以对组件进行自定义修改。";
-    }
-
-    @Override
     public String description(Locale locale) {
-        if (locale.equals(Locale.CHINESE)) {
+        if (locale.equals(Locale.CHINA)) {
             return "这是一个图片轮播，你可以对组件进行自定义修改。";
         }
         return "This is a picture carousel,  you can make custom change the component.";
