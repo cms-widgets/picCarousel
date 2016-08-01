@@ -43,22 +43,20 @@ public class MyWidgetTest extends WidgetTest {
     protected void editorWork(Widget widget, WebElement editor, Supplier<Map<String, Object>> currentWidgetProperties) {
         try{
             currentWidgetProperties.get();
-            assert false;
         }catch (IllegalStateException ignored){
             assertThat(0).as("save没有属性值返回异常").isEqualTo(0);
         }
         WebElement maxImg = editor.findElement(By.id("maxImg"));
         List<WebElement> input = maxImg.findElements(By.name("file"));
         assertThat(input).isNotNull();
-        assertThat(input.size()).isNotEqualTo(0);
+        assertThat(input.size()).as("图片上传插件").isNotEqualTo(0);
 
         WebElement minImg = editor.findElement(By.id("maxImg"));
         input = minImg.findElements(By.name("file"));
         assertThat(input).isNotNull();
-        assertThat(input.size()).isNotEqualTo(0);
+        assertThat(input.size()).as("图片上传插件").isNotEqualTo(0);
 
         try {
-            driver.findElement(By.id("editorSaver")).click();
             Map map = currentWidgetProperties.get();
         }catch (IllegalStateException ex){
             //无法模拟上传图片说以导致保存失败，应当忽略该异常
@@ -68,21 +66,6 @@ public class MyWidgetTest extends WidgetTest {
 
     @Override
     protected void browseWork(Widget widget, WidgetStyle style, Function<ComponentProperties, WebElement> uiChanger) {
-        uiChanger = (properties) -> {
-            widgetViewController.setCurrentProperties(properties);
-            String uri = "/browse/" + WidgetTestConfig.WidgetIdentity(widget) + "/" + style.id();
-            if (printPageSource())
-                try {
-                    mockMvc.perform(get(uri))
-                            .andDo(print());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new IllegalStateException("no print html");
-                }
-            driver.get("http://localhost" + uri);
-            WebElement webElement = driver.findElement(By.id("browse")).findElement(By.tagName("div"));
-            return webElement;
-        };
         ComponentProperties properties = new ComponentProperties();
         properties.put("componentId","picCarousel");
         ComponentProperties imgs = new ComponentProperties();
@@ -96,8 +79,6 @@ public class MyWidgetTest extends WidgetTest {
 
         List<WebElement> lis = webElement.findElements(By.tagName("img"));
         assertThat(lis.size()).isEqualTo(4);
-
-
     }
 
 

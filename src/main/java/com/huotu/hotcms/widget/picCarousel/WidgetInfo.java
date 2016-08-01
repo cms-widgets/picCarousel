@@ -9,6 +9,7 @@
 
 package com.huotu.hotcms.widget.picCarousel;
 
+import com.huotu.hotcms.service.entity.support.WidgetIdentifier;
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
@@ -17,6 +18,7 @@ import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,7 +31,7 @@ import java.util.Map;
 /**
  * @author CJ
  */
-public class WidgetInfo implements Widget{
+public class WidgetInfo implements Widget {
     /*
      * 图片轮播控件必须要有一个图片数组数据["1.png","2.png"]
      */
@@ -81,27 +83,25 @@ public class WidgetInfo implements Widget{
     @Override
     public Map<String, Resource> publicResources() {
         Map<String, Resource> map = new HashMap<>();
-        map.put("img/banner01.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/banner02.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/banner03.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/banner04.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/banner05.jpg",new ClassPathResource("img/banner01.jpg",getClass().getClassLoader()));
-        map.put("img/sd03.png",new ClassPathResource("img/sd03.png",getClass().getClassLoader()));
-        map.put("js/picCarousel.js",new ClassPathResource("js/picCarousel.js",getClass().getClassLoader()));
-        map.put("thumbnail/picCarousel1Style.png",new ClassPathResource("thumbnail/picCarousel1Style.png"
-                ,getClass().getClassLoader()));
+        map.put("img/banner01.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/banner02.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/banner03.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/banner04.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/banner05.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/banner05.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
+        map.put("img/sd03.png", new ClassPathResource("img/sd03.png", getClass().getClassLoader()));
+        map.put("js/picCarousel.js", new ClassPathResource("js/picCarousel.js", getClass().getClassLoader()));
+        map.put("thumbnail/picCarousel1Style.png", new ClassPathResource("thumbnail/picCarousel1Style.png"
+                , getClass().getClassLoader()));
         return map;
     }
 
     @Override
-    public Resource widgetDependencyContent(ContentType contentType) {
+    public Resource widgetDependencyContent(MediaType mediaType) {
+        if (mediaType.isCompatibleWith(Javascript)) {
+            return new ClassPathResource("js/picCarousel.js", getClass().getClassLoader());
+        }
         return null;
-    }
-
-    @Override
-    public Resource widgetJs() {
-        return new ClassPathResource("/js/picCarousel.js", getClass().getClassLoader());
     }
 
     @Override
@@ -126,7 +126,7 @@ public class WidgetInfo implements Widget{
         }
         String[] maxPicArr = (String[]) componentProperties.get(VALID_MAX_PICS);
         String[] minPicArr = (String[]) componentProperties.get(VALID_MIN_PICS);
-        if (maxPicArr == null || maxPicArr.length!=4 || minPicArr==null || minPicArr.length!=4) {
+        if (maxPicArr == null || maxPicArr.length != 4 || minPicArr == null || minPicArr.length != 4) {
             throw new IllegalArgumentException();
         }
     }
@@ -141,16 +141,17 @@ public class WidgetInfo implements Widget{
         List<String> maxImages = new ArrayList<>();
         ComponentProperties properties = new ComponentProperties();
         try {
-            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
-                    + "/"+"img/banner01.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
-                    + "/"+"img/banner02.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
-                    + "/"+"img/banner03.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + groupId() + "-" + widgetId() + "-" + version()
-                    + "/"+"img/banner04.jpg").httpUrl().toURI().toString());
-            properties.put("maxImgUrl",maxImages);
-        } catch (URISyntaxException |IOException e) {
+            WidgetIdentifier identifier = new WidgetIdentifier(groupId(), widgetId(), version());
+            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
+                    + "/" + "img/banner01.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
+                    + "/" + "img/banner02.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
+                    + "/" + "img/banner03.jpg").httpUrl().toURI().toString());
+            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
+                    + "/" + "img/banner04.jpg").httpUrl().toURI().toString());
+            properties.put("maxImgUrl", maxImages);
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
         return properties;
