@@ -2,29 +2,19 @@ package com.huotu.hotcms.widget.picCarousel;
 
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.Widget;
-import com.huotu.hotcms.widget.WidgetResolveService;
 import com.huotu.hotcms.widget.WidgetStyle;
-import com.huotu.hotcms.widget.loader.thymeleaf.process.ReplaceBrowseProcessor;
-import com.huotu.hotcms.widget.resolve.impl.WidgetResolveServiceImpl;
 import com.huotu.widget.test.WidgetTest;
-import com.huotu.widget.test.WidgetTestConfig;
 import com.huotu.widget.test.bean.WidgetViewController;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitWebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 /**
  * @author CJ
@@ -67,12 +57,8 @@ public class MyWidgetTest extends WidgetTest {
     @Override
     protected void browseWork(Widget widget, WidgetStyle style, Function<ComponentProperties, WebElement> uiChanger) {
         ComponentProperties properties = new ComponentProperties();
-        properties.put("componentId","picCarousel");
-        ComponentProperties imgs = new ComponentProperties();
-        imgs.put("maxImgUrl",new String[]{"1.jpg","2.jpg","3.jpg","4.jpg"});
-        imgs.put("minImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
-        properties.put("properties", imgs);
-
+        properties.put("maxImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
+        properties.put("minImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
         WebElement webElement = uiChanger.apply(properties);
 
         assertThat(webElement.getAttribute("id")).isEqualToIgnoringCase("picCarousel");
