@@ -14,8 +14,6 @@ import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
 import me.jiangcai.lib.resource.service.ResourceService;
-import org.apache.http.entity.ContentType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -119,9 +117,9 @@ public class WidgetInfo implements Widget {
         if (!flag) {
             throw new IllegalArgumentException();
         }
-        String[] maxPicArr = (String[]) componentProperties.get(VALID_MAX_PICS);
-        String[] minPicArr = (String[]) componentProperties.get(VALID_MIN_PICS);
-        if (maxPicArr == null || maxPicArr.length != 4 || minPicArr == null || minPicArr.length != 4) {
+        List<String> maxPicArr = (List<String>) componentProperties.get(VALID_MAX_PICS);
+        List<String> minPicArr = (List<String>) componentProperties.get(VALID_MIN_PICS);
+        if (maxPicArr == null || maxPicArr.size() != 4 || minPicArr == null || minPicArr.size() != 4) {
             throw new IllegalArgumentException();
         }
     }
@@ -145,7 +143,8 @@ public class WidgetInfo implements Widget {
                     + "/" + "img/banner03.jpg").httpUrl().toURI().toString());
             maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
                     + "/" + "img/banner04.jpg").httpUrl().toURI().toString());
-            properties.put("maxImgUrl", maxImages);
+            properties.put(VALID_MAX_PICS, maxImages);
+            properties.put(VALID_MIN_PICS, maxImages);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
