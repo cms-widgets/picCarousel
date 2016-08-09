@@ -37,12 +37,12 @@ public class MyWidgetTest extends WidgetTest {
             assertThat(0).as("save没有属性值返回异常").isEqualTo(0);
         }
         WebElement maxImg = editor.findElement(By.id("maxImg"));
-        List<WebElement> input = maxImg.findElements(By.name("file"));
+        List<WebElement> input = maxImg.findElements(By.tagName("input"));
         assertThat(input).isNotNull();
         assertThat(input.size()).as("图片上传插件").isNotEqualTo(0);
 
         WebElement minImg = editor.findElement(By.id("maxImg"));
-        input = minImg.findElements(By.name("file"));
+        input = minImg.findElements(By.tagName("input"));
         assertThat(input).isNotNull();
         assertThat(input.size()).as("图片上传插件").isNotEqualTo(0);
 
@@ -60,8 +60,6 @@ public class MyWidgetTest extends WidgetTest {
         properties.put("maxImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
         properties.put("minImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
         WebElement webElement = uiChanger.apply(properties);
-
-        assertThat(webElement.getAttribute("id")).isEqualToIgnoringCase("picCarousel");
 
         List<WebElement> lis = webElement.findElements(By.tagName("img"));
         assertThat(lis.size()).isEqualTo(4);

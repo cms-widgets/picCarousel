@@ -12,6 +12,7 @@ CMSWidgets.initWidget({
             }
         },
         uploadImage: function () {
+            var that = this;
             uploadForm({
                 ui: '#maxImg',
                 inputName: 'file',
@@ -20,13 +21,13 @@ CMSWidgets.initWidget({
                 maxFileCount: 4,
                 isCongruent: false,
                 successCallback: function (files, data, xhr, pd) {
-                    this.properties['maxImgUrl'].push(data.fileUri);
+                    that.properties['maxImgUrl'].push(data.fileUri);
                 },
                 deleteCallback: function (resp, data, jqXHR) {
                     console.log(data);
-                    $.grep(this.properties['maxImgUrl'], function (cur, index) {
+                    $.grep(that.properties['maxImgUrl'], function (cur, index) {
                         if (cur == data.fileUri) {
-                            this.properties['maxImgUrl'].splice(index, 1);
+                            that.properties['maxImgUrl'].splice(index, 1);
                         }
                     });
                 }
@@ -40,13 +41,13 @@ CMSWidgets.initWidget({
                 maxFileCount: 4,
                 isCongruent: false,
                 successCallback: function (files, data, xhr, pd) {
-                    this.properties['minImgUrl'].push(data.fileUri);
+                    that.properties['minImgUrl'].push(data.fileUri);
                 },
                 deleteCallback: function (resp, data, jqXHR) {
                     console.log(data);
-                    $.grep(this.properties['minImgUrl'], function (cur, index) {
+                    $.grep(that.properties['minImgUrl'], function (cur, index) {
                         if (cur == data.fileUri) {
-                            this.properties['minImgUrl'].splice(index, 1);
+                            that.properties['minImgUrl'].splice(index, 1);
                         }
                     });
                 }
