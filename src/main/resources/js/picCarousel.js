@@ -8,11 +8,11 @@ CMSWidgets.initWidget({
                 return this.properties;
             } else {
                 onFailed("组件数据缺少,未能保存,请完善。");
-                return;
+                return false;
             }
         },
         uploadImage: function () {
-            var that = this;
+            var me = this;
             uploadForm({
                 ui: '#maxImg',
                 inputName: 'file',
@@ -21,13 +21,12 @@ CMSWidgets.initWidget({
                 maxFileCount: 4,
                 isCongruent: false,
                 successCallback: function (files, data, xhr, pd) {
-                    that.properties['maxImgUrl'].push(data.fileUri);
+                    me.properties['maxImgUrl'].push(data.fileUri);
                 },
                 deleteCallback: function (resp, data, jqXHR) {
-                    console.log(data);
                     $.grep(that.properties['maxImgUrl'], function (cur, index) {
                         if (cur == data.fileUri) {
-                            that.properties['maxImgUrl'].splice(index, 1);
+                            me.properties['maxImgUrl'].splice(index, 1);
                         }
                     });
                 }
@@ -41,13 +40,12 @@ CMSWidgets.initWidget({
                 maxFileCount: 4,
                 isCongruent: false,
                 successCallback: function (files, data, xhr, pd) {
-                    that.properties['minImgUrl'].push(data.fileUri);
+                    me.properties['minImgUrl'].push(data.fileUri);
                 },
                 deleteCallback: function (resp, data, jqXHR) {
-                    console.log(data);
                     $.grep(that.properties['minImgUrl'], function (cur, index) {
                         if (cur == data.fileUri) {
-                            that.properties['minImgUrl'].splice(index, 1);
+                            me.properties['minImgUrl'].splice(index, 1);
                         }
                     });
                 }
@@ -63,8 +61,8 @@ CMSWidgets.initWidget({
             this.uploadImage();
         },
         close: function (globalId) {
-
+            $('#maxImg').siblings().remove();
+            $('#minImg').siblings().remove();
         }
-
     }
 });
