@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,11 +32,6 @@ public class MyWidgetTest extends WidgetTest {
 
     @Override
     protected void editorWork(Widget widget, WebElement editor, Supplier<Map<String, Object>> currentWidgetProperties) {
-        try{
-            currentWidgetProperties.get();
-        }catch (IllegalStateException ignored){
-            assertThat(0).as("save没有属性值返回异常").isEqualTo(0);
-        }
         WebElement maxImg = editor.findElement(By.id("maxImg"));
         List<WebElement> input = maxImg.findElements(By.tagName("input"));
         assertThat(input).isNotNull();
@@ -45,7 +41,6 @@ public class MyWidgetTest extends WidgetTest {
         input = minImg.findElements(By.tagName("input"));
         assertThat(input).isNotNull();
         assertThat(input.size()).as("图片上传插件").isNotEqualTo(0);
-
         try {
             Map map = currentWidgetProperties.get();
         }catch (IllegalStateException ex){
@@ -55,14 +50,16 @@ public class MyWidgetTest extends WidgetTest {
     }
 
     @Override
-    protected void browseWork(Widget widget, WidgetStyle style, Function<ComponentProperties, WebElement> uiChanger) {
-        ComponentProperties properties = new ComponentProperties();
-        properties.put("maxImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
-        properties.put("minImgUrl", new String[]{"1.jpg", "2.jpg", "3.jpg", "4.jpg"});
+    protected void browseWork(Widget widget, WidgetStyle style, Function<ComponentProperties, WebElement> uiChanger) throws IOException {
+        ComponentProperties properties = widget.defaultProperties(resourceService);
         WebElement webElement = uiChanger.apply(properties);
-
         List<WebElement> lis = webElement.findElements(By.tagName("img"));
         assertThat(lis.size()).isEqualTo(4);
+    }
+
+    @Override
+    protected void editorBrowseWork(Widget widget, Function<ComponentProperties, WebElement> uiChanger) throws IOException {
+
     }
 
 

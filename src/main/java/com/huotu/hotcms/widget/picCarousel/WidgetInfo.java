@@ -104,19 +104,7 @@ public class WidgetInfo implements Widget {
 
     @Override
     public void valid(String styleId, ComponentProperties componentProperties) throws IllegalArgumentException {
-        WidgetStyle[] widgetStyles = styles();
-        boolean flag = false;
-        if (widgetStyles == null || widgetStyles.length < 1) {
-            throw new IllegalArgumentException();
-        }
-        for (WidgetStyle ws : widgetStyles) {
-            if ((flag = ws.id().equals(styleId))) {
-                break;
-            }
-        }
-        if (!flag) {
-            throw new IllegalArgumentException();
-        }
+        WidgetStyle style = WidgetStyle.styleByID(this, styleId);
         List<String> maxPicArr = (List<String>) componentProperties.get(VALID_MAX_PICS);
         List<String> minPicArr = (List<String>) componentProperties.get(VALID_MIN_PICS);
         if (maxPicArr == null || maxPicArr.size() != 4 || minPicArr == null || minPicArr.size() != 4) {
