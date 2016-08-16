@@ -58,7 +58,8 @@ public class MyWidgetTest extends WidgetTest {
     }
 
     @Override
-    protected void editorBrowseWork(Widget widget, Function<ComponentProperties, WebElement> uiChanger) throws IOException {
+    protected void editorBrowseWork(Widget widget, Function<ComponentProperties, WebElement> uiChanger
+            , Supplier<Map<String, Object>> currentWidgetProperties) throws IOException {
 
     }
 
