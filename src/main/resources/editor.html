@@ -1,15 +1,19 @@
 <div class="borderBoxs">
     <form class="form-horizontal">
-        <div class="form-group">
-            <label class="col-sm-3 control-label">选择大图 - 宽度1920</label>
-            <div class="col-sm-9 oneImage">
-                <div class="imageUpload" id="maxImg"></div>
+        <div class="form-group clearfix">
+            <label class="col-sm-3 control-label">条数:</label>
+            <div class="col-sm-9">
+                <input type="number" class="form-control count" th:value="${count}" name="count"/>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">选择小图- 宽度1200</label>
-            <div class="col-sm-9 oneImage">
-                <div class="imageUpload" id="minImg"></div>
+        <div class="form-group clearfix">
+            <label class="col-sm-3 control-label">图库:</label>
+            <div class="col-sm-9">
+                <span data-name="serial" class="gallery-content"></span>
+                <div data-name="serial" class="gallery-item-area">
+                    <!--img item-->
+                    <img src="!{url}" title="是!{title}么?"/>
+                </div>
             </div>
         </div>
     </form>

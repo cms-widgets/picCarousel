@@ -9,37 +9,47 @@
 
 package com.huotu.hotcms.widget.picCarousel;
 
-import com.huotu.hotcms.service.entity.support.WidgetIdentifier;
+import com.huotu.hotcms.service.common.ContentType;
+import com.huotu.hotcms.service.entity.Category;
+import com.huotu.hotcms.service.entity.Gallery;
+import com.huotu.hotcms.service.entity.GalleryItem;
+import com.huotu.hotcms.service.model.GalleryItemModel;
+import com.huotu.hotcms.service.repository.CategoryRepository;
+import com.huotu.hotcms.service.repository.GalleryRepository;
+import com.huotu.hotcms.service.service.CategoryService;
+import com.huotu.hotcms.service.service.ContentService;
+import com.huotu.hotcms.service.service.GalleryItemService;
+import com.huotu.hotcms.service.service.GalleryService;
+import com.huotu.hotcms.widget.CMSContext;
 import com.huotu.hotcms.widget.ComponentProperties;
+import com.huotu.hotcms.widget.PreProcessWidget;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
+import com.huotu.hotcms.widget.service.CMSDataSourceService;
 import me.jiangcai.lib.resource.service.ResourceService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.util.NumberUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author CJ
  */
-public class WidgetInfo implements Widget {
+public class WidgetInfo implements Widget, PreProcessWidget {
     /*
      * 图片轮播控件必须要有一个图片数组数据["1.png","2.png"]
      */
-    public static final String VALID_MAX_PICS = "maxImgUrl";
-    public static final String VALID_MIN_PICS = "minImgUrl";
-
-    /*
-     * 指定风格的模板类型 如：html,text等
-     */
-    public static final String VALID_STYLE_TEMPLATE = "styleTemplate";
+    private static final String VALID_SERIAL = "serial";
+    private static final String VALID_DATA_LIST = "dataList";
+    private static final String VALID_COUNT = "count";
 
 
     @Override
@@ -76,13 +86,6 @@ public class WidgetInfo implements Widget {
     @Override
     public Map<String, Resource> publicResources() {
         Map<String, Resource> map = new HashMap<>();
-        map.put("img/banner01.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/banner02.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/banner03.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/banner04.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/banner05.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/banner05.jpg", new ClassPathResource("img/banner01.jpg", getClass().getClassLoader()));
-        map.put("img/sd03.png", new ClassPathResource("img/sd03.png", getClass().getClassLoader()));
         map.put("js/picCarousel.js", new ClassPathResource("js/picCarousel.js", getClass().getClassLoader()));
         map.put("thumbnail/picCarousel1Style.png", new ClassPathResource("thumbnail/picCarousel1Style.png"
                 , getClass().getClassLoader()));
@@ -105,9 +108,8 @@ public class WidgetInfo implements Widget {
     @Override
     public void valid(String styleId, ComponentProperties componentProperties) throws IllegalArgumentException {
         WidgetStyle style = WidgetStyle.styleByID(this, styleId);
-        List<String> maxPicArr = (List<String>) componentProperties.get(VALID_MAX_PICS);
-        List<String> minPicArr = (List<String>) componentProperties.get(VALID_MIN_PICS);
-        if (maxPicArr == null || maxPicArr.size() != 4 || minPicArr == null || minPicArr.size() != 4) {
+        String serial = (String) componentProperties.get(VALID_SERIAL);
+        if (serial == null || serial.equals("")) {
             throw new IllegalArgumentException();
         }
     }
@@ -118,25 +120,105 @@ public class WidgetInfo implements Widget {
     }
 
     @Override
-    public ComponentProperties defaultProperties(ResourceService resourceService) {
-        List<String> maxImages = new ArrayList<>();
+    public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException {
         ComponentProperties properties = new ComponentProperties();
-        try {
-            WidgetIdentifier identifier = new WidgetIdentifier(groupId(), widgetId(), version());
-            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
-                    + "/" + "img/banner01.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
-                    + "/" + "img/banner02.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
-                    + "/" + "img/banner03.jpg").httpUrl().toURI().toString());
-            maxImages.add(resourceService.getResource("widget/" + identifier.toURIEncoded()
-                    + "/" + "img/banner04.jpg").httpUrl().toURI().toString());
-            properties.put(VALID_MAX_PICS, maxImages);
-            properties.put(VALID_MIN_PICS, maxImages);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
+        // 随意找一个数据源,如果没有。那就没有。。
+        GalleryRepository galleryRepository = CMSContext.RequestContext().getWebApplicationContext()
+                .getBean(GalleryRepository.class);
+        List<Gallery> galleryList = galleryRepository.findByCategory_Site(CMSContext.RequestContext().getSite());
+        if (galleryList.isEmpty()) {
+            Gallery gallery = initGallery(initCategory());
+            initGalleryItem(gallery, resourceService);
+            properties.put(VALID_SERIAL, gallery.getSerial());
+        } else {
+            properties.put(VALID_SERIAL, galleryList.get(0).getSerial());
         }
+        properties.put(VALID_COUNT, 5);
         return properties;
+    }
+
+    @Override
+    public void prepareContext(WidgetStyle style, ComponentProperties properties, Map<String, Object> variables
+            , Map<String, String> parameters) {
+        String serial = (String) properties.get(VALID_SERIAL);
+        CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
+                .getBean(CMSDataSourceService.class);
+        int count = NumberUtils.parseNumber(properties.get(VALID_COUNT).toString(), Integer.class);
+        List<GalleryItemModel> picImg = cmsDataSourceService.findGalleryItems(serial, count);
+        variables.put(VALID_DATA_LIST, picImg);
+    }
+
+    /**
+     * 从CMSContext中获取CMSService的实现
+     *
+     * @param cmsService 需要返回的service接口
+     * @param <T>        返回的service实现
+     * @return
+     */
+    private <T> T getCMSServiceFromCMSContext(Class<T> cmsService) {
+        return CMSContext.RequestContext().
+                getWebApplicationContext().getBean(cmsService);
+    }
+
+    /**
+     * 初始化数据源
+     *
+     * @return
+     */
+    private Category initCategory() {
+        CategoryService categoryService = getCMSServiceFromCMSContext(CategoryService.class);
+        CategoryRepository categoryRepository = getCMSServiceFromCMSContext(CategoryRepository.class);
+        Category category = new Category();
+        category.setContentType(ContentType.Gallery);
+        category.setName("默认数据源");
+        categoryService.init(category);
+        category.setSite(CMSContext.RequestContext().getSite());
+
+        //保存到数据库
+        categoryRepository.save(category);
+        return category;
+    }
+
+    /**
+     * 初始化一个图库
+     *
+     * @return
+     */
+    private Gallery initGallery(Category category) {
+        GalleryService galleryService = getCMSServiceFromCMSContext(GalleryService.class);
+        ContentService contentService = getCMSServiceFromCMSContext(ContentService.class);
+        Gallery gallery = new Gallery();
+        gallery.setTitle("默认图库标题");
+        gallery.setDescription("这是一个默认图库");
+        gallery.setCategory(category);
+        contentService.init(gallery);
+        galleryService.saveGallery(gallery);
+        return gallery;
+    }
+
+    /**
+     * 初始化一个图片
+     *
+     * @param gallery
+     * @param resourceService
+     * @return
+     */
+    private GalleryItem initGalleryItem(Gallery gallery, ResourceService resourceService) throws IOException {
+        ContentService contentService = getCMSServiceFromCMSContext(ContentService.class);
+        GalleryItemService galleryItemService = getCMSServiceFromCMSContext(GalleryItemService.class);
+        GalleryItem galleryItem = new GalleryItem();
+        galleryItem.setTitle("默认图片标题");
+        galleryItem.setDescription("这是一个默认图片");
+        ClassPathResource classPathResource = new ClassPathResource("img/picImg.png", getClass().getClassLoader());
+        InputStream inputStream = classPathResource.getInputStream();
+        String imgPath = "_resources/" + UUID.randomUUID().toString() + ".png";
+        resourceService.uploadResource(imgPath, inputStream);
+        galleryItem.setThumbUri(imgPath);
+        galleryItem.setSize("xxx");
+        galleryItem.setGallery(gallery);
+        contentService.init(galleryItem);
+        galleryItemService.saveGalleryItem(galleryItem);
+        return galleryItem;
     }
 
 }

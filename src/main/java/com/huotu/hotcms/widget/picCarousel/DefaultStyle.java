@@ -50,7 +50,7 @@ public class DefaultStyle implements WidgetStyle {
 
     @Override
     public Resource previewTemplate() {
-        return new ClassPathResource(MessageFormat.format("/template/{0}PreviewTemplate.html", id()), getClass().getClassLoader());
+        return null;
     }
 
     @Override
