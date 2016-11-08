@@ -20,11 +20,7 @@ import com.huotu.hotcms.service.service.CategoryService;
 import com.huotu.hotcms.service.service.ContentService;
 import com.huotu.hotcms.service.service.GalleryItemService;
 import com.huotu.hotcms.service.service.GalleryService;
-import com.huotu.hotcms.widget.CMSContext;
-import com.huotu.hotcms.widget.ComponentProperties;
-import com.huotu.hotcms.widget.PreProcessWidget;
-import com.huotu.hotcms.widget.Widget;
-import com.huotu.hotcms.widget.WidgetStyle;
+import com.huotu.hotcms.widget.*;
 import com.huotu.hotcms.widget.service.CMSDataSourceService;
 import me.jiangcai.lib.resource.service.ResourceService;
 import org.springframework.core.io.ClassPathResource;
@@ -34,11 +30,7 @@ import org.springframework.util.NumberUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author CJ
@@ -80,7 +72,7 @@ public class WidgetInfo implements Widget, PreProcessWidget {
 
     @Override
     public String dependVersion() {
-        return "1.0-SNAPSHOT";
+        return "1.1.0";
     }
 
     @Override
@@ -148,17 +140,6 @@ public class WidgetInfo implements Widget, PreProcessWidget {
         variables.put(VALID_DATA_LIST, picImg);
     }
 
-    /**
-     * 从CMSContext中获取CMSService的实现
-     *
-     * @param cmsService 需要返回的service接口
-     * @param <T>        返回的service实现
-     * @return
-     */
-    private <T> T getCMSServiceFromCMSContext(Class<T> cmsService) {
-        return CMSContext.RequestContext().
-                getWebApplicationContext().getBean(cmsService);
-    }
 
     /**
      * 初始化数据源
