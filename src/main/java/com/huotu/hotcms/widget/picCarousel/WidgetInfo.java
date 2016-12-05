@@ -115,8 +115,7 @@ public class WidgetInfo implements Widget, PreProcessWidget {
     public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException {
         ComponentProperties properties = new ComponentProperties();
         // 随意找一个数据源,如果没有。那就没有。。
-        GalleryRepository galleryRepository = CMSContext.RequestContext().getWebApplicationContext()
-                .getBean(GalleryRepository.class);
+        GalleryRepository galleryRepository = getCMSServiceFromCMSContext(GalleryRepository.class);
         List<Gallery> galleryList = galleryRepository.findByCategory_Site(CMSContext.RequestContext().getSite());
         if (galleryList.isEmpty()) {
             Gallery gallery = initGallery(initCategory());
